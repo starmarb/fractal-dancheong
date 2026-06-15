@@ -1,7 +1,16 @@
 <style>
 * { box-sizing: border-box; }
 .dc-root { --dc-text-1: var(--color-text-primary, #1c1a17); --dc-text-2: var(--color-text-secondary, #6b6358); --dc-text-3: var(--color-text-tertiary, #9a9082); --dc-bd-2: var(--color-border-secondary, #d9d2c6); --dc-bd-3: var(--color-border-tertiary, #e7e1d6); --dc-bg-2: var(--color-background-secondary, #f4f1ea); --dc-radius-lg: var(--border-radius-lg, 14px); --dc-radius-md: var(--border-radius-md, 9px);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--dc-text-1); max-width: 760px; }
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--dc-text-1); max-width: 1060px; }
+.layout { display: flex; gap: 22px; align-items: flex-start; }
+.canvas-col { flex: 0 1 470px; min-width: 260px; position: sticky; top: 8px; }
+.controls-col { flex: 1 1 360px; min-width: 0; }
+.controls-col .toolbar:first-child { padding-top: 0; }
+@media (max-width: 720px){
+  .layout { flex-direction: column; }
+  .canvas-col { flex: none; width: 100%; max-width: 520px; align-self: center; position: static; }
+  .controls-col .toolbar:first-child { padding-top: 12px; }
+}
 .wrap { position: relative; width: 100%; padding-bottom: 100%; border-radius: var(--dc-radius-lg); border: 0.5px solid var(--dc-bd-3); overflow: hidden; background: #14110d; }
 .wrap canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; }
 .wrap .glmsg { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; text-align: center; padding: 24px; color: #f4f1ea; font-size: 13px; line-height: 1.5; }
@@ -42,41 +51,46 @@ button.act.primary { border-color: var(--dc-text-1); font-weight: 500; }
 </style>
 
 <div class="dc-root">
-  <div class="wrap"><canvas id="cComp"></canvas><div class="glmsg" id="glmsg"></div></div>
+  <div class="layout">
+    <div class="canvas-col">
+      <div class="wrap"><canvas id="cComp"></canvas><div class="glmsg" id="glmsg"></div></div>
+    </div>
+    <div class="controls-col">
+      <div class="toolbar">
+        <div class="cg"><label>layers</label> <input type="range" min="1" max="6" value="4" step="1" id="numLayers"> <b id="numLayersOut">4</b></div>
+        <div class="cg"><label>style</label>
+          <select class="dc" id="modeSel">
+            <option value="escape">filled (escape)</option>
+            <option value="shapes" selected>shapes (motifs)</option>
+            <option value="newton">petals (newton) · experimental</option>
+          </select>
+        </div>
+        <div class="sep"></div>
+        <div class="cg"><label>ground</label><div class="bg-row" id="bgRow"></div></div>
+        <div class="sep"></div>
+        <div class="cg"><label>preset</label>
+          <select class="dc" id="presetSel"><option value="">choose…</option></select>
+        </div>
+        <button class="act" id="btnRandom">Shuffle</button>
+        <button class="act" id="btnReset">Reset</button>
+      </div>
 
-  <div class="toolbar">
-    <div class="cg"><label>layers</label> <input type="range" min="1" max="6" value="4" step="1" id="numLayers"> <b id="numLayersOut">4</b></div>
-    <div class="cg"><label>style</label>
-      <select class="dc" id="modeSel">
-        <option value="escape">filled (escape)</option>
-        <option value="shapes" selected>shapes (motifs)</option>
-        <option value="newton">petals (newton) · experimental</option>
-      </select>
+      <div class="toolbar" style="padding-top:2px">
+        <div class="cg"><label>export</label>
+          <select class="dc" id="exportSel"><option value="1">1× (700px)</option><option value="2" selected>2× (1400px)</option><option value="3">3× (2100px)</option></select>
+        </div>
+        <button class="act primary" id="btnPng">Download PNG ↓</button>
+        <div class="sep"></div>
+        <button class="act" id="btnSave">Save config</button>
+        <button class="act" id="btnLoad">Load config</button>
+        <input type="file" id="fileLoad" accept="application/json,.json" style="display:none">
+      </div>
+
+      <div class="panels" id="panels"></div>
+      <div class="status" id="status"></div>
+      <div class="hint">Switch <b>style</b> to <b>shapes</b> to build from real motifs — petals, beads, leaves, diamonds, stars, rings — repeated <b>count</b> times per layer. Give nested layers different counts and small rotations so they interlock; white or ink outlines read most like real 단청 piping.</div>
     </div>
-    <div class="sep"></div>
-    <div class="cg"><label>ground</label><div class="bg-row" id="bgRow"></div></div>
-    <div class="sep"></div>
-    <div class="cg"><label>preset</label>
-      <select class="dc" id="presetSel"><option value="">choose…</option></select>
-    </div>
-    <button class="act" id="btnRandom">Shuffle</button>
-    <button class="act" id="btnReset">Reset</button>
   </div>
-
-  <div class="toolbar" style="padding-top:2px">
-    <div class="cg"><label>export</label>
-      <select class="dc" id="exportSel"><option value="1">1× (700px)</option><option value="2" selected>2× (1400px)</option><option value="3">3× (2100px)</option></select>
-    </div>
-    <button class="act primary" id="btnPng">Download PNG ↓</button>
-    <div class="sep"></div>
-    <button class="act" id="btnSave">Save config</button>
-    <button class="act" id="btnLoad">Load config</button>
-    <input type="file" id="fileLoad" accept="application/json,.json" style="display:none">
-  </div>
-
-  <div class="panels" id="panels"></div>
-  <div class="status" id="status"></div>
-  <div class="hint">Switch <b>style</b> to <b>shapes</b> to build from real motifs — petals, beads, leaves, diamonds, stars, rings — repeated <b>count</b> times per layer. Give nested layers different counts and small rotations so they interlock; white or ink outlines read most like real 단청 piping.</div>
 </div>
 
 <script>
