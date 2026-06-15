@@ -3,4 +3,4 @@ Using the five main colors (오방색 Ohbangsaek), shapes, patterns found in Kor
 
 With many different options and experimental directions, each user is able to create vastly different patterns and motifs that they can save and share. 
 
-Try the live demo here: 
+[Try the live demo here](https://starmarb.github.io/fractal-dancheong/)
